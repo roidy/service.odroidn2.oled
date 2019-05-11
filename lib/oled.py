@@ -33,10 +33,11 @@ SWITCHCAPVCC = 0x2
 
 
 class Oled:
-    def __init__(self, i2c, displayType):
+    def __init__(self, i2c, displayType, flipDisplay):
         self._width = 128
         self._height = 64
         self._i2c = i2c
+        self._flipDisplay = flipDisplay
         self._displayType = displayType
         self._pages = self._height // 8
         self._image = [0] * (self._width * self._height)
@@ -67,32 +68,37 @@ class Oled:
 
     def _initSH1106(self):
         self._command(DISPLAYOFF)
-        self._command(MEMORYMODE)
-        self._command(SETHIGHCOLUMN)
-        self._command(0xB0)
-        self._command(0xC8)
-        self._command(SETLOWCOLUMN)
-        self._command(0x10)
-        self._command(0x40)
-        self._command(SETCONTRAST)
-        self._command(0x7F)
-        self._command(SETSEGMENTREMAP)
         self._command(NORMALDISPLAY)
+        self._command(SETDISPLAYCLOCKDIV)
+        self._command(0x80)
         self._command(SETMULTIPLEX)
         self._command(0x3F)
-        self._command(DISPLAYALLON_RESUME)
         self._command(SETDISPLAYOFFSET)
         self._command(0x00)
-        self._command(SETDISPLAYCLOCKDIV)
-        self._command(0xF0)
-        self._command(SETPRECHARGE)
-        self._command(0x22)
-        self._command(SETCOMPINS)
-        self._command(0x12)
-        self._command(SETVCOMDETECT)
-        self._command(0x20)
+        self._command(SETSTARTLINE | 0x00)
         self._command(CHARGEPUMP)
         self._command(0x14)
+        self._command(MEMORYMODE)
+        self._command(0x00)
+        if (self._flipDisplay):
+            self._command(SEGREMAP)
+            self._command(SETCOMPINS)
+            self._command(PAGEADDR)
+            self._command(COMSCANINC)
+        else:
+            self._command(SEGREMAP | 0x1)
+            self._command(SETCOMPINS)
+            self._command(PAGEADDR)
+            self._command(COMSCANDEC)
+        self._command(SETCONTRAST)
+        self._command(0xCF)
+        self._command(SETPRECHARGE)
+        self._command(0xF1)
+        self._command(SETVCOMDETECT)
+        self._command(0x00)
+        self._command(DISPLAYALLON_RESUME)
+        self._command(NORMALDISPLAY)
+        self._command(0x2e)
         self._command(DISPLAYON)
 
     def _initSSD1306_64(self):
@@ -108,8 +114,12 @@ class Oled:
         self._command(0x14)  # 0x14 0x2f
         self._command(MEMORYMODE)
         self._command(0x00)
-        self._command(SEGREMAP | 0x1)
-        self._command(COMSCANDEC)
+        if (self._flipDisplay):
+            self._command(SEGREMAP)
+            self._command(COMSCANINC)
+        else:
+            self._command(SEGREMAP | 0x1)
+            self._command(COMSCANDEC)
         self._command(SETCOMPINS)
         self._command(0x12)
         self._command(SETCONTRAST)
@@ -135,8 +145,12 @@ class Oled:
         self._command(0x14)  # 0x14 0x2f
         self._command(MEMORYMODE)
         self._command(0x00)
-        self._command(SEGREMAP | 0x1)
-        self._command(COMSCANDEC)
+        if (self._flipDisplay):
+            self._command(SEGREMAP)
+            self._command(COMSCANINC)
+        else:
+            self._command(SEGREMAP | 0x1)
+            self._command(COMSCANDEC)
         self._command(SETCOMPINS)
         self._command(0x02)
         self._command(SETCONTRAST)

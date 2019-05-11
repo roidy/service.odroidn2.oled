@@ -35,6 +35,7 @@ class OledSettings:
         self._settingBrightness = getInt("display.brightness")
         self._settingPlaybackBrightness = getInt("display.playbackbrightness")
         self._settingFont = getSetting("display.font")
+        self._settingFlipDisplay = getBool("display.flip")
 
     def i2cAddress(self):
         return self._settingI2CAddress
@@ -53,3 +54,6 @@ class OledSettings:
 
     def font(self):
         return self._settingFont
+
+    def flipDisplay(self):
+        return self._settingFlipDisplay

@@ -30,6 +30,10 @@ msgctxt "#30006"
 msgid "Font"
 msgstr ""
 
+msgctxt "#30007"
+msgid "Flip display"
+msgstr ""
+
 msgctxt "#30100"
 msgid "0x3C"
 msgstr ""

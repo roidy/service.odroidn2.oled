@@ -59,7 +59,8 @@ class OledAddon():
         self._status = "idle"
         self._wait = 0
         self._oled = Oled(self._settings.i2cAddress(),
-                          self._settings.displayType())
+                          self._settings.displayType(),
+                          self._settings.flipDisplay())
         self._oled.setBrightness(self._settings.brightness())
 
     def __del__(self):
@@ -94,7 +95,8 @@ class OledAddon():
         self._font = self.getFont(self._settings.font())
         self._largeFont = self.getLargeFont(self._settings.font())
         self._oled = Oled(self._settings.i2cAddress(),
-                          self._settings.displayType())
+                          self._settings.displayType(),
+                          self._settings.flipDisplay())
         self._oled.setBrightness(self._settings.brightness())
 
     def getFont(self, font):
