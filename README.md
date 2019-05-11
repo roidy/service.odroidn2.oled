@@ -2,6 +2,8 @@
 Odroid N2 Kodi service for controlling an i2c oled display.
 ![Untitled](https://user-images.githubusercontent.com/4118048/57568209-06776c80-73dc-11e9-87ea-a966197095fd.jpg)
 
+### Download:- [Odroid N2 Oled Driver v0.1](https://github.com/roidy/script.odroidn2.oled/releases/download/v0.1/service.odroidn2.oled.zip)
+
 ## Supported Displays
 This addon supports 4 pin I2C 128x32 or 128x64 oled displays that use either the SSD1306 or SH1106 driver.
 This addon does NOT support SPI displays commonly identified by the display having 7 pins, although most SPI displays can be converted into I2C, this requires board level soldering and is beyond the scope of this documentation. 
