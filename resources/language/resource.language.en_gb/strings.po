@@ -1,0 +1,63 @@
+msgid ""
+msgstr ""
+
+# Script Settings
+msgctxt "#30000"
+msgid "General"
+msgstr ""
+
+msgctxt "#30001"
+msgid "I2C address"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Display type"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Short format if < 1 hour"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Brightness"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Playback brightness"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Font"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Flip display"
+msgstr ""
+
+msgctxt "#30100"
+msgid "0x3C"
+msgstr ""
+
+msgctxt "#30101"
+msgid "0x3D"
+msgstr ""
+
+msgctxt "#30102"
+msgid "128x64-SH1106"
+msgstr ""
+
+msgctxt "#30103"
+msgid "128x64-SSD1306"
+msgstr ""
+
+msgctxt "#30104"
+msgid "128x32-SSD1306"
+msgstr ""
+
+msgctxt "#30105"
+msgid "5x7 Dot matrix"
+msgstr ""
+
+msgctxt "#30106"
+msgid "7 segment"
+msgstr ""
