@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="service.odroidn2.oled" name="Odroid N2 OLED Driver" version="0.1" provider-name="roidy">
+  <requires>
+    <import addon="xbmc.python" version="2.26.0"/>
+  </requires>
+  <extension point="xbmc.service" library="service.py" start="startup" />
+  <extension point="xbmc.addon.metadata">
+    <summary>Odroid N2 service for controlling an oled display</summary>
+    <description>Odroid N2 Service for controlling a 128x64 or 128x32 i2c oled display using either the SH1106 or SSD1306 driver chip.</description>
+    <disclaimer>WARNING:- Incorrectly wiring any device to your Odroid N2's GPIO can cause permanent damage, the author of this addon accepts no responsibility for damage caused.</disclaimer>
+    <license>MIT</license>
+    <source></source>
+    <platform>linux</platform>
+    <assets>
+      <icon>resources/images/icon.png</icon>
+      <screenshot>resources/images/screenshot1.jpg</screenshot>
+      <screenshot>resources/images/screenshot2.jpg</screenshot>
+      <screenshot>resources/images/screenshot3.jpg</screenshot>
+    </assets>
+  </extension>
+</addon>
