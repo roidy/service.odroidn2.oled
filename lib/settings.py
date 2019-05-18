@@ -36,6 +36,10 @@ class OledSettings:
         self._settingPlaybackBrightness = getInt("display.playbackbrightness")
         self._settingFont = getSetting("display.font")
         self._settingFlipDisplay = getBool("display.flip")
+        self._settingClockOnlyMode = getBool("display.clockonlymode")
+        self._settingHideIcons = getBool("display.hideicons")
+        self._settingsHideSDRIcon = getBool("display.hidesdricon")
+        self._settingsIconType = getSetting("display.icontype")
 
     def i2cAddress(self):
         return self._settingI2CAddress
@@ -57,3 +61,18 @@ class OledSettings:
 
     def flipDisplay(self):
         return self._settingFlipDisplay
+
+    def clockOnlyMode(self):
+        return self._settingClockOnlyMode
+
+    def hideIcons(self):
+        return self._settingHideIcons
+
+    def hideSRDIcon(self):
+        return self._settingsHideSDRIcon
+
+    def iconType(self):
+        if self._settingsIconType == "solid":
+            return True
+        else:
+            return False

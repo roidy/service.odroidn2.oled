@@ -34,6 +34,22 @@ msgctxt "#30007"
 msgid "Flip display"
 msgstr ""
 
+msgctxt "#30008"
+msgid "Clock only mode"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Hide Icons"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Hide SDR icon"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Icon type"
+msgstr ""
+
 msgctxt "#30100"
 msgid "0x3C"
 msgstr ""
@@ -60,4 +76,12 @@ msgstr ""
 
 msgctxt "#30106"
 msgid "7 segment"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Solid"
+msgstr ""
+
+msgctxt "#30108"
+msgid "Outlined"
 msgstr ""

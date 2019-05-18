@@ -223,12 +223,8 @@ class Oled:
         else:
             self._command((brightness * 16) - 16)
 
-    def getStringWidth(self, str, invert, border, charset):
-        charWidth = charset[0][0]
-        charHeight = charset[0][1]
-        charByteHeight = charset[0][2]
+    def getStringWidth(self, str, charset):
         charStride = charset[0][3]
-        strWidth = len(str) * charStride - 1
 
         dashFix = 0
         for c in str:
@@ -240,7 +236,7 @@ class Oled:
 
         return len(str) * charStride + dashFix + 3
 
-    def drawIcons(self, info, x, y, center, charset):
+    def drawIcons(self, info, x, y, center, solid, charset):
         if (center):
             width = 0
             for i in xrange(0, len(info)):
@@ -252,10 +248,10 @@ class Oled:
 
         for i in xrange(0, len(info)):
             pos = self.drawString(
-                info[i], x, y, True, True, charset)
+                info[i], x, y, solid, charset)
             x += pos + 4
 
-    def drawString(self, str, x, y, invert, border, charset):
+    def drawString(self, str, x, y, solid, charset):
         charWidth = charset[0][0]
         charHeight = charset[0][1]
         charByteHeight = charset[0][2]
@@ -264,12 +260,14 @@ class Oled:
         px = x
         py = y
 
-        if invert:
+        if solid:
             border = False
             for by in xrange(y - 2, y + 1 + charHeight + 1):
                 for bx in xrange(x - 2, x + strWidth + 2):
                     self._image[bx + (by * self._width)
                                 ] = 0
+        else:
+            border = True
 
         dashFix = 0
         for c in str:
@@ -303,7 +301,7 @@ class Oled:
                 self._image[x - 3 + (by * self._width)] = 1
                 self._image[x + 2 + strWidth + dashFix + (by * self._width)] = 1
 
-        if invert:
+        if solid:
             for by in xrange(y - 2, y + 1 + charHeight + 1):
                 for bx in xrange(x - 2, x + strWidth + 2 + dashFix):
                     self._image[bx + (by * self._width)

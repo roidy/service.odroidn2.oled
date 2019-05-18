@@ -67,18 +67,19 @@ class OledAddon():
         self._oled.close()
 
     def onAVStarted(self):
-        self._oled.clear()
-        if (xbmc.Player().isPlayingVideo()):
-            self._status = "video"
-            if (not self._oled.isDisplayHeight32()):
-                info = self.getVideoDetails()
-                self._oled.drawIcons(info, 0, 6, True, fiveBySevenFullset)
-        elif (xbmc.Player().isPlayingAudio()):
-            self._status = "audio"
-            if (not self._oled.isDisplayHeight32()):
-                info = self.getAudioDetails()
-                self._oled.drawIcons(["TRACK"], 2, 6, False, fiveBySevenFullset)
-                self._oled.drawIcons(info, 50, 6, False, fiveBySevenFullset)
+        if (not self._settings.clockOnlyMode()):
+            self._oled.clear()
+            if (xbmc.Player().isPlayingVideo()):
+                self._status = "video"
+                if (not self._oled.isDisplayHeight32() and not self._settings.hideIcons()):
+                    info = self.getVideoDetails()
+                    self._oled.drawIcons(info, 0, 6, True, self._settings.iconType(), fiveBySevenFullset)
+            elif (xbmc.Player().isPlayingAudio()):
+                self._status = "audio"
+                if (not self._oled.isDisplayHeight32() and not self._settings.hideIcons()):
+                    info = self.getAudioDetails()
+                    self._oled.drawIcons(["TRACK"], 2 if self._settings.iconType() else 3, 6, False, self._settings.iconType(), fiveBySevenFullset)
+                    self._oled.drawIcons(info, 50, 6, False, self._settings.iconType(), fiveBySevenFullset)
 
     def onPlayBackEnded(self):
         self._oled.clear()
@@ -118,7 +119,10 @@ class OledAddon():
                     if ":" in line:
                         parts = line.split(":")
                         if parts[0].strip() == "EOTF":
-                            return parts[1].strip()
+                            if (parts[1].strip().upper() == "SDR" and self._settings.hideSRDIcon()):
+                                return None
+                            else:
+                                return parts[1].strip()
         except IOError:
             return None
         return None
