@@ -241,7 +241,7 @@ class Oled:
             width = 0
             for i in xrange(0, len(info)):
                 w = self.getStringWidth(
-                    info[i], True, True, charset)
+                    info[i], charset)
                 width += w + 4
 
             x = ((128 - width) // 2) + 4
