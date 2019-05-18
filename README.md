@@ -2,7 +2,7 @@
 Odroid N2 Kodi service for controlling an i2c oled display.
 ![Untitled](https://user-images.githubusercontent.com/4118048/57568209-06776c80-73dc-11e9-87ea-a966197095fd.jpg)
 
-### Download:- [Odroid N2 Oled Driver v0.1.2](https://github.com/roidy/service.odroidn2.oled/releases/download/v0.1.2/service.odroidn2.oled.zip)
+### Download:- [Odroid N2 Oled Driver v0.1.3](https://github.com/roidy/service.odroidn2.oled/releases/download/v0.1.3/service.odroidn2.oled.zip)
 
 __NOTE: This addon is in no way connected to OpenVFD and does not require OpenVFD to work, if you already have a vfd.conf file that is setup for the N2 then please remove it.__
 
