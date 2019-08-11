@@ -50,6 +50,10 @@ msgctxt "#30011"
 msgid "Icon type"
 msgstr ""
 
+msgctxt "#30012"
+msgid "Playback time mode"
+msgstr ""
+
 msgctxt "#30100"
 msgid "0x3C"
 msgstr ""
@@ -84,4 +88,12 @@ msgstr ""
 
 msgctxt "#30108"
 msgid "Outlined"
+msgstr ""
+
+msgctxt "#30109"
+msgid "Elapsed"
+msgstr ""
+
+msgctxt "#30110"
+msgid "Remaining"
 msgstr ""

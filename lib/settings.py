@@ -37,9 +37,10 @@ class OledSettings:
         self._settingFont = getSetting("display.font")
         self._settingFlipDisplay = getBool("display.flip")
         self._settingClockOnlyMode = getBool("display.clockonlymode")
+        self._settingTimeMode = getSetting("display.timemode")
         self._settingHideIcons = getBool("display.hideicons")
-        self._settingsHideSDRIcon = getBool("display.hidesdricon")
-        self._settingsIconType = getSetting("display.icontype")
+        self._settingHideSDRIcon = getBool("display.hidesdricon")
+        self._settingIconType = getSetting("display.icontype")
 
     def i2cAddress(self):
         return self._settingI2CAddress
@@ -65,14 +66,20 @@ class OledSettings:
     def clockOnlyMode(self):
         return self._settingClockOnlyMode
 
+    def displayTimeElapsed(self):
+        if self._settingTimeMode == 'elapsed':
+            return True
+        else:
+            return False
+
     def hideIcons(self):
         return self._settingHideIcons
 
     def hideSRDIcon(self):
-        return self._settingsHideSDRIcon
+        return self._settingHideSDRIcon
 
     def iconType(self):
-        if self._settingsIconType == "solid":
+        if self._settingIconType == "solid":
             return True
         else:
             return False

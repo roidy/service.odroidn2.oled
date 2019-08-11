@@ -189,10 +189,15 @@ class OledAddon():
 
         if self._status == "video":
             try:
-                playtime = int(xbmc.Player().getTime())
+                elapsedTime = int(xbmc.Player().getTime())
                 totalTime = int(xbmc.Player().getTotalTime())
+                remainingTime = totalTime - elapsedTime
+                if self._settings.displayTimeElapsed():
+                    playtime = elapsedTime
+                else:
+                    playtime = remainingTime
                 if (playtime >= 0):
-                    self._oled.drawProgress(playtime, totalTime)
+                    self._oled.drawProgress(elapsedTime, totalTime)
                     if (totalTime < 3600 and self._settings.shortFormat()):
                         self._oled.drawTime(
                             playtime, 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font, False, True)
@@ -205,10 +210,15 @@ class OledAddon():
 
         if self._status == "audio":
             try:
-                playtime = int(xbmc.Player().getTime())
+                elapsedTime = int(xbmc.Player().getTime())
                 totalTime = int(xbmc.Player().getTotalTime())
+                remainingTime = totalTime - elapsedTime
+                if self._settings.displayTimeElapsed():
+                    playtime = elapsedTime
+                else:
+                    playtime = remainingTime
                 if (playtime >= 0):
-                    self._oled.drawProgress(playtime, totalTime)
+                    self._oled.drawProgress(elapsedTime, totalTime)
                     self._oled.drawTrack(int(xbmc.getInfoLabel(
                         "MusicPlayer.TrackNumber")), 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font)
                     self._oled.drawTime(
