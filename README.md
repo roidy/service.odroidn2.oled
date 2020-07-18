@@ -49,7 +49,7 @@ This information is accurate for the 2.42" displays as show in the picture, othe
 
 The Oled CS pin can be tied to any free ground pin on the Odroid N2 (9,14,20,25,30,34 or 39)
 
-![gfx](https://user-images.githubusercontent.com/4118048/87856703-bcabdf80-c918-11ea-9c72-06ebb335b5d4.jpg)
+![gfx](https://user-images.githubusercontent.com/4118048/87856867-da2d7900-c919-11ea-8e7f-eb635ae39034.jpg)
 
 __NOTE: SPI is disabled by default on the Odroid N2 and must be activated by issuing the following command from a SSH session__
 
