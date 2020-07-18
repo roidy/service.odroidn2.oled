@@ -3,6 +3,8 @@ from smbus2 import SMBusWrapper
 from lib.logging import *
 import time
 import xbmcgui
+import gpio
+import spi
 
 CHARGEPUMP = 0x8D
 COLUMNADDR = 0x21
@@ -31,6 +33,8 @@ SETSTARTLINE = 0x40
 SETVCOMDETECT = 0xDB
 SWITCHCAPVCC = 0x2
 
+BUSNUMBER = 2
+
 
 class Oled:
     def __init__(self, i2c, displayType, flipDisplay):
@@ -41,10 +45,21 @@ class Oled:
         self._displayType = displayType
         self._pages = self._height // 8
         self._image = [0] * (self._width * self._height)
-        try:
-            self.bus = SMBus(2)
-        except IOError:
-            xbmcgui.Dialog().notification("OLED IO Error", "Please check your I2C address and controller type.", xbmcgui.NOTIFICATION_ERROR, 5000)
+        self.bus = None
+        if self._displayType != "128x64-ssd1309 spi":
+            try:
+                self.bus = SMBus(BUSNUMBER)
+            except IOError:
+                xbmcgui.Dialog().notification("OLED IO Error", "Please check your I2C address and controller type.", xbmcgui.NOTIFICATION_ERROR, 5000)
+        else:
+            self.spi= spi.SPI("/dev/spidev32766.0")
+            self.spi.mode = spi.SPI.MODE_0
+            self.spi.bits_per_word = 8
+            self.spi.speed = 5000000
+            gpio.initGPIO()
+            gpio.gpioWriteDC(0)
+            gpio.gpioDoReset()
+
         if self._displayType == "128x64-sh1106":
             self.displayHeight32 = False
             self._initSH1106()
@@ -57,6 +72,11 @@ class Oled:
             self.displayHeight32 = True
             self._initSSD1306_32()
             self.display = self._displaySSD1306
+        elif self._displayType == "128x64-ssd1309 spi":
+            self.displayHeight32 = False
+            self._initSSD1309SPI()
+            self.display = self._displaySSD1309SPI
+
         self.clear()
         self.display()
 
@@ -64,7 +84,13 @@ class Oled:
         return self.displayHeight32
 
     def _command(self, c):
-        self.bus.write_byte_data(self._i2c, 0x00, c)
+        try:
+            self.bus.write_byte_data(self._i2c, 0x00, c)
+        except:
+            pass
+
+    def _commandSPI(self, val):
+        self.spi.transfer([val])
 
     def _initSH1106(self):
         self._command(DISPLAYOFF)
@@ -131,6 +157,38 @@ class Oled:
         self._command(DISPLAYALLON_RESUME)
         self._command(NORMALDISPLAY)
         self._command(DISPLAYON)
+
+    def _initSSD1309SPI(self):
+        gpio.gpioWriteDC(0)
+        self._commandSPI(DISPLAYOFF)
+        self._commandSPI(SETDISPLAYCLOCKDIV)
+        self._commandSPI(0x80)
+        self._commandSPI(SETMULTIPLEX)
+        self._commandSPI(0x3F)
+        self._commandSPI(SETDISPLAYOFFSET)
+        self._commandSPI(0x0)
+        self._commandSPI(SETSTARTLINE | 0x0)
+        self._commandSPI(CHARGEPUMP)
+        self._commandSPI(0x14)  # 0x14 0x2f
+        self._commandSPI(MEMORYMODE)
+        self._commandSPI(0x00)
+        if (self._flipDisplay):
+            self._commandSPI(SEGREMAP)
+            self._commandSPI(COMSCANINC)
+        else:
+            self._commandSPI(SEGREMAP | 0x1)
+            self._commandSPI(COMSCANDEC)
+        self._commandSPI(SETCOMPINS)
+        self._commandSPI(0x12)
+        self._commandSPI(SETCONTRAST)
+        self._commandSPI(0xCF)
+        self._commandSPI(SETPRECHARGE)
+        self._commandSPI(0xF1)
+        self._commandSPI(SETVCOMDETECT)
+        self._commandSPI(0x00)  # 0x40 0x00
+        self._commandSPI(DISPLAYALLON_RESUME)
+        self._commandSPI(NORMALDISPLAY)
+        self._commandSPI(DISPLAYON)
 
     def _initSSD1306_32(self):
         self._command(DISPLAYOFF)
@@ -207,6 +265,29 @@ class Oled:
             with SMBusWrapper(2) as bus:
                 bus.write_i2c_block_data(self._i2c, 0x40, buffer[i:i+16])
 
+    def _displaySSD1309SPI(self):
+        buffer = []
+        for page in xrange(self._pages):
+            for x in xrange(self._width):
+                bits = 0
+                for bit in [0, 1, 2, 3, 4, 5, 6, 7]:
+                    bits = bits << 1
+                    bits |= self._image[x + ((page * 8 + 7 - bit) * self._width)]
+                buffer.append(bits)
+
+        gpio.gpioWriteDC(0)
+        self._commandSPI(COLUMNADDR)
+        self._commandSPI(0)              # Column start address. (0 = reset)
+        self._commandSPI(self._width - 1)   # Column end address.
+        self._commandSPI(PAGEADDR)
+        self._commandSPI(0)              # Page start address. (0 = reset)
+        self._commandSPI(self._pages - 1)  # Page end address.
+
+        # Write buffer data
+        gpio.gpioWriteDC(1)
+        for i in xrange(0, len(buffer), 8):
+            self.spi.transfer(buffer[i:i+8])
+
     def clear(self):
         for i in xrange(self._width * self._height):
             self._image[i] = 0
@@ -214,7 +295,10 @@ class Oled:
     def close(self):
         self.clear()
         self.display()
-        self.bus.close()
+        try:
+            self.bus.close()
+        except:
+            pass
 
     def setBrightness(self, brightness):
         self._command(SETCONTRAST)

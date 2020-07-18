@@ -74,6 +74,10 @@ msgctxt "#30104"
 msgid "128x32-SSD1306"
 msgstr ""
 
+msgctxt "#30111"
+msgid "128x64-SSD1309 SPI"
+msgstr ""
+
 msgctxt "#30105"
 msgid "5x7 Dot matrix"
 msgstr ""
