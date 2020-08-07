@@ -67,6 +67,7 @@ class OledAddon():
         self._oled.close()
 
     def onAVStarted(self):
+        self._oled.setBrightness(self._settings.playbackBrightness())
         if (not self._settings.clockOnlyMode()):
             self._oled.clear()
             if (xbmc.Player().isPlayingVideo()):
@@ -83,11 +84,13 @@ class OledAddon():
 
     def onPlayBackEnded(self):
         self._oled.clear()
+        self._oled.setBrightness(self._settings.brightness())
         self._status = "waiting"
         self._wait = 0
 
     def onPlayBackStopped(self):
         self._oled.clear()
+        self._oled.setBrightness(self._settings.brightness())
         self._status = "waiting"
         self._wait = 0
 
