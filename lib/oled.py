@@ -181,9 +181,9 @@ class Oled:
         self._commandSPI(SETCOMPINS)
         self._commandSPI(0x12)
         self._commandSPI(SETCONTRAST)
-        self._commandSPI(0xCF)
+        self._commandSPI(0xCF) #0xCF
         self._commandSPI(SETPRECHARGE)
-        self._commandSPI(0xF1)
+        self._commandSPI(0x22) #0xF1
         self._commandSPI(SETVCOMDETECT)
         self._commandSPI(0x00)  # 0x40 0x00
         self._commandSPI(DISPLAYALLON_RESUME)
@@ -301,11 +301,19 @@ class Oled:
             pass
 
     def setBrightness(self, brightness):
-        self._command(SETCONTRAST)
-        if brightness == 16:
-            self._command(255)
+        if self._displayType == "128x64-ssd1309 spi":
+            gpio.gpioWriteDC(0)
+            self._commandSPI(SETCONTRAST)
+            if brightness == 16:
+                self._commandSPI(255)
+            else:
+                self._commandSPI((brightness * 16) - 16)
         else:
-            self._command((brightness * 16) - 16)
+            self._command(SETCONTRAST)
+            if brightness == 16:
+                self._command(255)
+            else:
+                self._command((brightness * 16) - 16)
 
     def getStringWidth(self, str, charset):
         charStride = charset[0][3]
