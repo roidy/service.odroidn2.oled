@@ -50,6 +50,8 @@ class OledAddon():
         self._player.setOnAVStartedCallback(self)
         self._player.setOnPlayBackStoppedCallback(self)
         self._player.setOnPlayBackEndedCallback(self)
+        self._videoAudioCodec = None
+        self._videoAudioChannels = None
         self._monitor = monitor
         self._monitor.setSettingsChangedCallback(self)
         self._settings = OledSettings()
@@ -140,7 +142,9 @@ class OledAddon():
     def getVideoDetails(self):
         info = []
         audioCodec = xbmc.getInfoLabel("VideoPlayer.AudioCodec")
+        self._videoAudioCodec = audioCodec
         audioChannels = xbmc.getInfoLabel("VideoPlayer.AudioChannels")
+        self._videoAudioChannels = audioChannels
         resolution = xbmc.getInfoLabel("VideoPlayer.VideoResolution")
         hdr = self.getHDRStatus()
         logNotice("Video Resolution: " + resolution)
@@ -160,6 +164,16 @@ class OledAddon():
         if (hdr is not None):
             info.append(hdr.upper())
         return info
+
+    def checkAudioDetails(self):
+        if (not self._oled.isDisplayHeight32() and not self._settings.hideIcons()):
+            audioCodec = xbmc.getInfoLabel("VideoPlayer.AudioCodec")
+            audioChannels = xbmc.getInfoLabel("VideoPlayer.AudioChannels")
+
+            if audioCodec != self._videoAudioCodec or audioChannels != self._videoAudioChannels:
+                self._oled.clear()
+                info = self.getVideoDetails()
+                self._oled.drawIcons(info, 0, 6, True, self._settings.iconType(), fiveBySevenFullset)
 
     def getAudioDetails(self):
         info = []
@@ -192,6 +206,7 @@ class OledAddon():
 
         if self._status == "video":
             try:
+                self.checkAudioDetails()
                 elapsedTime = int(xbmc.Player().getTime())
                 totalTime = int(xbmc.Player().getTotalTime())
                 remainingTime = totalTime - elapsedTime
