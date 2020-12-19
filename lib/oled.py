@@ -1,10 +1,10 @@
-from smbus2 import SMBus
-from smbus2 import SMBusWrapper
+from lib.smbus2 import SMBus
+from lib.smbus2 import SMBusWrapper
 from lib.logging import *
 import time
 import xbmcgui
-import gpio
-import spi
+import lib.gpio
+import lib.spi
 
 CHARGEPUMP = 0x8D
 COLUMNADDR = 0x21
@@ -224,29 +224,29 @@ class Oled:
     def _displaySH1106(self):
         page = 0xB0
         step = self._width * 8
-        for y in xrange(0, step * 8, step):
+        for y in range(0, step * 8, step):
             self._command(page)
             self._command(0x02)
             self._command(0x10)
             page += 1
 
             buffer = []
-            for x in xrange(self._width):
+            for x in range(self._width):
                 byte = 0
-                for n in xrange(0, step, self._width):
+                for n in range(0, step, self._width):
                     byte |= (self._image[x + y + n] & 0x01) << 8
                     byte >>= 1
                 buffer.append(byte)
 
             # Write buffer data
-            for i in xrange(0, len(buffer), 16):
+            for i in range(0, len(buffer), 16):
                 with SMBusWrapper(2) as bus:
                     bus.write_i2c_block_data(self._i2c, 0x40, buffer[i:i+16])
 
     def _displaySSD1306(self):
         buffer = []
-        for page in xrange(self._pages):
-            for x in xrange(self._width):
+        for page in range(self._pages):
+            for x in range(self._width):
                 bits = 0
                 for bit in [0, 1, 2, 3, 4, 5, 6, 7]:
                     bits = bits << 1
@@ -261,14 +261,14 @@ class Oled:
         self._command(self._pages - 1)  # Page end address.
 
         # Write buffer data
-        for i in xrange(0, len(buffer), 16):
+        for i in range(0, len(buffer), 16):
             with SMBusWrapper(2) as bus:
                 bus.write_i2c_block_data(self._i2c, 0x40, buffer[i:i+16])
 
     def _displaySSD1309SPI(self):
         buffer = []
-        for page in xrange(self._pages):
-            for x in xrange(self._width):
+        for page in range(self._pages):
+            for x in range(self._width):
                 bits = 0
                 for bit in [0, 1, 2, 3, 4, 5, 6, 7]:
                     bits = bits << 1
@@ -285,11 +285,11 @@ class Oled:
 
         # Write buffer data
         gpio.gpioWriteDC(1)
-        for i in xrange(0, len(buffer), 8):
+        for i in range(0, len(buffer), 8):
             self.spi.transfer(buffer[i:i+8])
 
     def clear(self):
-        for i in xrange(self._width * self._height):
+        for i in range(self._width * self._height):
             self._image[i] = 0
 
     def close(self):
@@ -331,13 +331,13 @@ class Oled:
     def drawIcons(self, info, x, y, center, solid, charset):
         if (center):
             width = 0
-            for i in xrange(0, len(info)):
+            for i in range(0, len(info)):
                 w = self.getStringWidth(info[i], charset)
                 width += w + 4
 
             x = ((128 - width) // 2) + 4
 
-        for i in xrange(0, len(info)):
+        for i in range(0, len(info)):
             pos = self.drawString(
                 info[i], x, y, solid, charset)
             x += pos + 4
@@ -353,8 +353,8 @@ class Oled:
 
         if solid:
             border = False
-            for by in xrange(y - 2, y + 1 + charHeight + 1):
-                for bx in xrange(x - 2, x + strWidth + 2):
+            for by in range(y - 2, y + 1 + charHeight + 1):
+                for bx in range(x - 2, x + strWidth + 2):
                     self._image[bx + (by * self._width)
                                 ] = 0
         else:
@@ -384,17 +384,17 @@ class Oled:
                 px += charStride
 
         if border:
-            for bx in xrange(x - 2, x + strWidth + 2 + dashFix):
+            for bx in range(x - 2, x + strWidth + 2 + dashFix):
                 self._image[bx + ((y - 3) * self._width)] = 1
                 self._image[bx + ((y + 2 + charHeight) * self._width)] = 1
 
-            for by in xrange(y - 2, y + 2 + charHeight):
+            for by in range(y - 2, y + 2 + charHeight):
                 self._image[x - 3 + (by * self._width)] = 1
                 self._image[x + 2 + strWidth + dashFix + (by * self._width)] = 1
 
         if solid:
-            for by in xrange(y - 2, y + 1 + charHeight + 1):
-                for bx in xrange(x - 2, x + strWidth + 2 + dashFix):
+            for by in range(y - 2, y + 1 + charHeight + 1):
+                for bx in range(x - 2, x + strWidth + 2 + dashFix):
                     self._image[bx + (by * self._width)
                                 ] = not self._image[bx + (by * self._width)]
             self._image[x - 2 +
@@ -410,13 +410,13 @@ class Oled:
         return len(str) * charStride + dashFix + 3
 
     def _drawChar(self, char, x, y, cw, cbh, chset):
-        for sx in xrange(0, cw):
-            for sy in xrange(0, cbh):
+        for sx in range(0, cw):
+            for sy in range(0, cbh):
                 dy = y
                 chdata = chset[char][sx + sy * cw]
                 for bit in [0, 1, 2, 3, 4, 5, 6, 7]:
-                    self._image[(sx + x) + ((8 * sy) + dy) *
-                                self._width] = (chdata >> bit) & 0x01
+                    self._image[int((sx + x) + ((8 * sy) + dy) *
+                                self._width)] = (chdata >> bit) & 0x01
                     dy += 1
 
     def drawProgress(self, seconds, totalSeconds):
@@ -425,7 +425,7 @@ class Oled:
         else:
             y = 56
 
-        for py in xrange(y - 3, y + 4):
+        for py in range(y - 3, y + 4):
             self._image[10 + (py * self._width)] = 1
             self._image[117 + (py * self._width)] = 1
 

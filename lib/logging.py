@@ -19,4 +19,4 @@ def logWarning(message):
 
 
 def logNotice(message):
-    log(message, xbmc.LOGNOTICE)
+    log(message, xbmc.LOGINFO)
