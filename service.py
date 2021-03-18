@@ -207,8 +207,27 @@ class OledAddon():
         if self._status == "video":
             try:
                 self.checkAudioDetails()
-                elapsedTime = int(xbmc.Player().getTime())
-                totalTime = int(xbmc.Player().getTotalTime())
+                videotype = xbmc.Player().getPlayingFile()
+                videotype = videotype.split(":")
+                if videotype[0] == "pvr":
+                    elapsedTime = xbmc.getInfoLabel("PVR.EpgEventElapsedTime")
+                    totalTime = xbmc.getInfoLabel("PVR.EpgEventDuration")
+                    elapsedTime = elapsedTime.split(":")
+                    totalTime = totalTime.split(":")
+                    if len(elapsedTime) == 3:
+                        elapsedTime = 3600*int(elapsedTime[0]) + 60*int(elapsedTime[1]) + int(elapsedTime[2])
+                    else:
+                        elapsedTime = 60*int(elapsedTime[0]) + int(elapsedTime[1])
+                    if len(totalTime) == 3:
+                        totalTime = 3600*int(totalTime[0]) + 60*int(totalTime[1]) + int(totalTime[2])
+                    else:
+                        totalTime = 60*int(totalTime[0]) + int(totalTime[1])
+                    if totalTime < 1:
+                        elapsedTime = int(xbmc.Player().getTime())
+                        totalTime = int(xbmc.Player().getTotalTime())
+                else:
+                    elapsedTime = int(xbmc.Player().getTime())
+                    totalTime = int(xbmc.Player().getTotalTime())
                 remainingTime = totalTime - elapsedTime
                 if self._settings.displayTimeElapsed():
                     playtime = elapsedTime
@@ -228,8 +247,18 @@ class OledAddon():
 
         if self._status == "audio":
             try:
-                elapsedTime = int(xbmc.Player().getTime())
-                totalTime = int(xbmc.Player().getTotalTime())
+                elapsedTime = xbmc.getInfoLabel("Player.Time")
+                totalTime = xbmc.getInfoLabel("Player.Duration ")
+                elapsedTime = elapsedTime.split(":")
+                totalTime = totalTime.split(":")
+                if len(elapsedTime) == 3:
+                    elapsedTime = 3600*int(elapsedTime[0]) + 60*int(elapsedTime[1]) + int(elapsedTime[2])
+                else:
+                    elapsedTime = 60*int(elapsedTime[0]) + int(elapsedTime[1])
+                if len(totalTime) == 3:
+                    totalTime = 3600*int(totalTime[0]) + 60*int(totalTime[1]) + int(totalTime[2])
+                else:
+                    totalTime = 60*int(totalTime[0]) + int(totalTime[1])
                 remainingTime = totalTime - elapsedTime
                 if self._settings.displayTimeElapsed():
                     playtime = elapsedTime
@@ -237,14 +266,12 @@ class OledAddon():
                     playtime = remainingTime
                 if (playtime >= 0):
                     self._oled.drawProgress(elapsedTime, totalTime)
-                    self._oled.drawTrack(int(xbmc.getInfoLabel(
-                        "MusicPlayer.TrackNumber")), 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font)
-                    self._oled.drawTime(
-                        playtime, 48, 20 - (self._oled.isDisplayHeight32() * 20), self._font, False, False)
+                    if (xbmc.getInfoLabel("MusicPlayer.TrackNumber") != ""):
+                        self._oled.drawTrack(int(xbmc.getInfoLabel("MusicPlayer.TrackNumber")), 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font)
+                    self._oled.drawTime(playtime, 48, 20 - (self._oled.isDisplayHeight32() * 20), self._font, False, False)
                     self._oled.display()
             except:
                 pass
-
 
 if __name__ == "__main__":
     logNotice('Service started')
