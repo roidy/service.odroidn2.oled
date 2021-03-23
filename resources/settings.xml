@@ -6,6 +6,7 @@
     <setting label="30007" type="bool" id="display.flip" enable="true" />
     <setting label="30003" type="bool" id="display.shortformat" enable="true" />
     <setting label="30008" type="bool" id="display.clockonlymode" enable="true" />
+    <setting label="30013" type="bool" id="display.clockwhilescreensaver" enable="true" />
     <setting label="30012" type="labelenum" id="display.timemode" lvalues="30109|30110" default="Elapsed" enabled="true" />
     <setting label="30011" type="labelenum" id="display.icontype" lvalues="30107|30108" default="Solid" enable="true" />
     <setting label="30009" type="bool" id="display.hideicons" enable="true" />

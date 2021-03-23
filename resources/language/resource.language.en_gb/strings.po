@@ -54,6 +54,10 @@ msgctxt "#30012"
 msgid "Playback time mode"
 msgstr ""
 
+msgctxt "#30013"
+msgid "Show Clock while Screensaver is active"
+msgstr ""
+
 msgctxt "#30100"
 msgid "0x3C"
 msgstr ""
