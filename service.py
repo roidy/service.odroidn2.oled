@@ -70,10 +70,8 @@ class OledAddon():
         self._videoAudioChannels = None
         self._monitor = monitor
         self._monitor.setSettingsChangedCallback(self)
-
         self._monitor.setScreensaverActivatedCallback(self)
         self._monitor.setScreensaverDeactivatedCallback(self)
-
         self._settings = OledSettings()
         self._settings.readSettings()
         self._font = self.getFont(self._settings.font())
@@ -110,14 +108,12 @@ class OledAddon():
         self._oled.clear()
         self._oled.setBrightness(self._settings.brightness())
         self._status = "waiting"
-        logNotice("onPlayBackEnded: " + self._status)
         self._wait = 0
 
     def onPlayBackStopped(self):
         self._oled.clear()
         self._oled.setBrightness(self._settings.brightness())
         self._status = "waiting"
-        logNotice("onPlayBackStopped: " + self._status)
         self._wait = 0
 
     def onSettingsChanged(self):
