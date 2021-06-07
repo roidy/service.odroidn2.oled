@@ -128,10 +128,14 @@ class OledAddon():
     def onScreensaverDeactivated(self):
         if self._status == "off":
             self._status = "idle"
+        if (self._status == "video"):
+            self._oled.setBrightness(self._settings.playbackBrightness())
 
     def onScreensaverActivated(self):
-        if (self._status != "audio" and not self._settings.clockwhilescreensaver()):
+        if (self._status != "video" and self._status != "audio" and not self._settings.clockwhilescreensaver()):
             self._status = "off"
+        if (self._status == "video"):
+            self._oled.setBrightness(self._settings.brightness())
 
     def getFont(self, font):
         if (font == "5x7 dot matrix"):
