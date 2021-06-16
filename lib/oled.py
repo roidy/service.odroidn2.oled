@@ -3,8 +3,8 @@ from lib.smbus2 import SMBusWrapper
 from lib.logging import *
 import time
 import xbmcgui
-import lib.gpio
-import lib.spi
+from lib.gpio import *
+from lib.spi import SPI
 
 CHARGEPUMP = 0x8D
 COLUMNADDR = 0x21
@@ -52,13 +52,13 @@ class Oled:
             except IOError:
                 xbmcgui.Dialog().notification("OLED IO Error", "Please check your I2C address and controller type.", xbmcgui.NOTIFICATION_ERROR, 5000)
         else:
-            self.spi= spi.SPI("/dev/spidev32766.0")
-            self.spi.mode = spi.SPI.MODE_0
+            self.spi= SPI("/dev/spidev32766.0")
+            self.spi.mode = SPI.MODE_0
             self.spi.bits_per_word = 8
             self.spi.speed = 5000000
-            gpio.initGPIO()
-            gpio.gpioWriteDC(0)
-            gpio.gpioDoReset()
+            initGPIO()
+            gpioWriteDC(0)
+            gpioDoReset()
 
         if self._displayType == "128x64-sh1106":
             self.displayHeight32 = False
@@ -159,7 +159,7 @@ class Oled:
         self._command(DISPLAYON)
 
     def _initSSD1309SPI(self):
-        gpio.gpioWriteDC(0)
+        gpioWriteDC(0)
         self._commandSPI(DISPLAYOFF)
         self._commandSPI(SETDISPLAYCLOCKDIV)
         self._commandSPI(0x80)
@@ -275,7 +275,7 @@ class Oled:
                     bits |= self._image[x + ((page * 8 + 7 - bit) * self._width)]
                 buffer.append(bits)
 
-        gpio.gpioWriteDC(0)
+        gpioWriteDC(0)
         self._commandSPI(COLUMNADDR)
         self._commandSPI(0)              # Column start address. (0 = reset)
         self._commandSPI(self._width - 1)   # Column end address.
@@ -284,7 +284,7 @@ class Oled:
         self._commandSPI(self._pages - 1)  # Page end address.
 
         # Write buffer data
-        gpio.gpioWriteDC(1)
+        gpioWriteDC(1)
         for i in range(0, len(buffer), 8):
             self.spi.transfer(buffer[i:i+8])
 
@@ -302,7 +302,7 @@ class Oled:
 
     def setBrightness(self, brightness):
         if self._displayType == "128x64-ssd1309 spi":
-            gpio.gpioWriteDC(0)
+            gpioWriteDC(0)
             self._commandSPI(SETCONTRAST)
             if brightness == 16:
                 self._commandSPI(255)
@@ -358,7 +358,7 @@ class Oled:
                     self._image[bx + (by * self._width)
                                 ] = 0
         else:
-            border = True
+            border = False
 
         dashFix = 0
         for c in str:

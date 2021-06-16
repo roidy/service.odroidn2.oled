@@ -37,6 +37,7 @@ class OledSettings:
         self._settingFont = getSetting("display.font")
         self._settingFlipDisplay = getBool("display.flip")
         self._settingClockOnlyMode = getBool("display.clockonlymode")
+        self._settingClockWhileScreensaver = getBool("display.clockwhilescreensaver")
         self._settingTimeMode = getSetting("display.timemode")
         self._settingHideIcons = getBool("display.hideicons")
         self._settingHideSDRIcon = getBool("display.hidesdricon")
@@ -65,6 +66,9 @@ class OledSettings:
 
     def clockOnlyMode(self):
         return self._settingClockOnlyMode
+
+    def clockwhilescreensaver(self):
+        return self._settingClockWhileScreensaver
 
     def displayTimeElapsed(self):
         if self._settingTimeMode == 'elapsed':

@@ -35,6 +35,8 @@ class Monitor(xbmc.Monitor):
     def __init__(self):
         super(Monitor, self).__init__()
         self._settingsChangedCallback = None
+        self._ScreensaverActivatedCallback = None
+        self._ScreensaverDeactivatedCallback = None
 
     def setSettingsChangedCallback(self, callback):
         self._settingsChangedCallback = callback
@@ -42,6 +44,20 @@ class Monitor(xbmc.Monitor):
     def onSettingsChanged(self):
         if (self._settingsChangedCallback is not None):
             self._settingsChangedCallback.onSettingsChanged()
+
+    def setScreensaverActivatedCallback(self, callback):
+        self._ScreensaverActivatedCallback = callback
+
+    def onScreensaverActivated(self):
+        if (self._ScreensaverActivatedCallback is not None):
+            self._ScreensaverActivatedCallback.onScreensaverActivated()
+
+    def setScreensaverDeactivatedCallback(self, callback):
+        self._ScreensaverDeactivatedCallback = callback
+
+    def onScreensaverDeactivated(self):
+        if (self._ScreensaverDeactivatedCallback is not None):
+            self._ScreensaverDeactivatedCallback.onScreensaverDeactivated()
 
 
 class OledAddon():
@@ -54,12 +70,16 @@ class OledAddon():
         self._videoAudioChannels = None
         self._monitor = monitor
         self._monitor.setSettingsChangedCallback(self)
+        self._monitor.setScreensaverActivatedCallback(self)
+        self._monitor.setScreensaverDeactivatedCallback(self)
         self._settings = OledSettings()
         self._settings.readSettings()
         self._font = self.getFont(self._settings.font())
         self._largeFont = self.getLargeFont(self._settings.font())
         self._status = "idle"
         self._wait = 0
+        self._totalTimeOld = 0
+        self._totalTime = 0
         self._oled = Oled(self._settings.i2cAddress(),
                           self._settings.displayType(),
                           self._settings.flipDisplay())
@@ -104,6 +124,18 @@ class OledAddon():
                           self._settings.displayType(),
                           self._settings.flipDisplay())
         self._oled.setBrightness(self._settings.brightness())
+
+    def onScreensaverDeactivated(self):
+        if self._status == "off":
+            self._status = "idle"
+        if (self._status == "video"):
+            self._oled.setBrightness(self._settings.playbackBrightness())
+
+    def onScreensaverActivated(self):
+        if (self._status != "video" and self._status != "audio" and not self._settings.clockwhilescreensaver()):
+            self._status = "off"
+        if (self._status == "video"):
+            self._oled.setBrightness(self._settings.brightness())
 
     def getFont(self, font):
         if (font == "5x7 dot matrix"):
@@ -197,6 +229,10 @@ class OledAddon():
                 self._status = "idle"
         ############################################################
 
+        if self._status == "off":
+            self._oled.clear()
+            self._oled.display()
+
         if self._status == "idle":
             now = datetime.datetime.today()
             seconds = (now.hour * 60) + now.minute
@@ -206,6 +242,7 @@ class OledAddon():
 
         if self._status == "video":
             try:
+                self._totalTimeOld = self._totalTime
                 self.checkAudioDetails()
                 videotype = xbmc.Player().getPlayingFile()
                 videotype = videotype.split(":")
@@ -228,6 +265,7 @@ class OledAddon():
                 else:
                     elapsedTime = int(xbmc.Player().getTime())
                     totalTime = int(xbmc.Player().getTotalTime())
+                self._totalTime = totalTime
                 remainingTime = totalTime - elapsedTime
                 if self._settings.displayTimeElapsed():
                     playtime = elapsedTime
@@ -236,12 +274,17 @@ class OledAddon():
                 if (playtime >= 0):
                     self._oled.drawProgress(elapsedTime, totalTime)
                     if (totalTime < 3600 and self._settings.shortFormat()):
-                        self._oled.drawTime(
-                            playtime, 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font, False, True)
+                        if self._totalTimeOld >= 3600:
+                            self._oled.clear()
+                            if (not self._oled.isDisplayHeight32() and not self._settings.hideIcons()):
+                                info = self.getVideoDetails()
+                                self._oled.drawIcons(info, 0, 6, True, self._settings.iconType(), fiveBySevenFullset)
+                        self._oled.drawTime(playtime, 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font, False, True)
+                        
                     else:
-                        self._oled.drawTime(
-                            playtime, 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font, True, True)
+                        self._oled.drawTime(playtime, 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font, True, True)
                     self._oled.display()
+                 
             except:
                 pass
 
@@ -268,6 +311,7 @@ class OledAddon():
                     self._oled.drawProgress(elapsedTime, totalTime)
                     if (xbmc.getInfoLabel("MusicPlayer.TrackNumber") != ""):
                         self._oled.drawTrack(int(xbmc.getInfoLabel("MusicPlayer.TrackNumber")), 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font)
+                    #self._oled.drawTrack(int(xbmc.getInfoLabel("MusicPlayer.PlaylistPosition ")), 0, 20 - (self._oled.isDisplayHeight32() * 20), self._font)
                     self._oled.drawTime(playtime, 48, 20 - (self._oled.isDisplayHeight32() * 20), self._font, False, False)
                     self._oled.display()
             except:
